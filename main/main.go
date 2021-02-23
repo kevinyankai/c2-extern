@@ -42,16 +42,19 @@ func ginRouter() *gin.Engine {
 }
 
 func sealCommit2(c *gin.Context) {
+	fmt.Println("Enter sealCommit2 function...............")
 	req := &Commit2Request{}
 	preHandleRequest(c, req)
 
 	// TODO: handle business
 
 	// return
+	fmt.Println("Exiting sealCommit2 function...............")
 	c.Data(http.StatusOK, "application/json", createResponse(RetCodeOK, "Successful", nil, nil))
 }
 
 func getResult(c *gin.Context) {
+	fmt.Println("Enter getResult function...............")
 	req := &Commit2Request{}
 	preHandleRequest(c, req)
 
@@ -61,6 +64,7 @@ func getResult(c *gin.Context) {
 	proof[1] = 'b'
 	proof[2] = 'c'
 
+	fmt.Println("Exiting getResult function...............")
 	c.Data(http.StatusOK, "application/json", createResponse(RetCodeOK, "Successful", nil, proof))
 }
 
