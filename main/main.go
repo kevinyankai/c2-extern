@@ -18,14 +18,13 @@ const RetCodeUnknownError = -1
 type Commit2Request struct {
 	C2In         []byte `json:"c2In"`
 	SectorNumber uint64 `json:"sectorNumber"`
-	MinerID      uint64 `json:"minerID"`
+	MinerID      string `json:"minerID"`
 }
 
 type Commit2Response struct {
-	RetCode 	int64					`json:"retCode"`
-	ErrMsg		string					`json:"errMsg"`
-	Addition    interface{}				`json:"addition"`
-	Proof    	[]byte					`json:"proof"`
+	RetCode 	int					`json:"code"`
+	Message		string				`json:"msg"`
+	Data    interface{}				`json:"data"`
 }
 
 func main() {
@@ -50,7 +49,7 @@ func sealCommit2(c *gin.Context) {
 
 	// return
 	fmt.Println("Exiting sealCommit2 function...............")
-	c.Data(http.StatusOK, "application/json", createResponse(RetCodeOK, "Successful", nil, nil))
+	c.Data(http.StatusOK, "application/json", createResponse(RetCodeOK, "Successful", nil))
 }
 
 func getResult(c *gin.Context) {
@@ -65,38 +64,37 @@ func getResult(c *gin.Context) {
 	proof[2] = 'c'
 
 	fmt.Println("Exiting getResult function...............")
-	c.Data(http.StatusOK, "application/json", createResponse(RetCodeOK, "Successful", nil, proof))
+	c.Data(http.StatusOK, "application/json", createResponse(RetCodeOK, "Successful", proof))
 }
 
 func preHandleRequest(c *gin.Context, req *Commit2Request) {
 	b, e := c.GetRawData()
 	if e != nil {
-		c.Data(http.StatusBadRequest, "application/json", createResponse(RetCodeBadRequest, fmt.Sprintf("bad request. get row data failed. error: %+v", e.Error()), nil, nil))
+		c.Data(http.StatusBadRequest, "application/json", createResponse(RetCodeBadRequest, fmt.Sprintf("bad request. get row data failed. error: %+v", e.Error()), nil))
 	}
 
 	reader, e := gzip.NewReader(bytes.NewReader(b))
 	defer reader.Close()
 	if e != nil {
-		c.Data(http.StatusInternalServerError, "application/json", createResponse(RetCodeInternalServerError, fmt.Sprintf("interval server error. unzip data failed. error: %+v", e.Error()), nil, nil))
+		c.Data(http.StatusInternalServerError, "application/json", createResponse(RetCodeInternalServerError, fmt.Sprintf("interval server error. unzip data failed. error: %+v", e.Error()), nil))
 	}
 
 	data, e := ioutil.ReadAll(reader)
 	if e != nil {
-		c.Data(http.StatusInternalServerError, "application/json", createResponse(RetCodeInternalServerError, fmt.Sprintf("interval server error. unzip data failed. error: %+v", e.Error()), nil, nil))
+		c.Data(http.StatusInternalServerError, "application/json", createResponse(RetCodeInternalServerError, fmt.Sprintf("interval server error. unzip data failed. error: %+v", e.Error()), nil))
 	}
 
 	e = json.Unmarshal(data, req)
 	if e != nil {
-		c.Data(http.StatusInternalServerError, "application/json", createResponse(RetCodeInternalServerError, fmt.Sprintf("interval server error. parse data failed. error: %+v", e.Error()), nil, nil))
+		c.Data(http.StatusInternalServerError, "application/json", createResponse(RetCodeInternalServerError, fmt.Sprintf("interval server error. parse data failed. error: %+v", e.Error()), nil))
 	}
 }
 
-func createResponse(retCode int64, errMsg string, addition interface{}, proof []byte) []byte {
+func createResponse(retCode int, errMsg string, data interface{}) []byte {
 	resp := Commit2Response{
 		RetCode: 	retCode,
-		ErrMsg:  	errMsg,
-		Addition: 	addition,
-		Proof:		proof,
+		Message:  	errMsg,
+		Data: 		data,
 	}
 
 	bytes, _ := json.Marshal(resp)

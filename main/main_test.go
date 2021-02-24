@@ -19,7 +19,7 @@ func TestGinRouter(t *testing.T) {
 	data[1] = '2'
 	data[2] = '3'
 	body := Commit2Request{
-		MinerID: 1,
+		MinerID: "1",
 		SectorNumber: 2,
 		C2In: data,
 	}
