@@ -29,13 +29,13 @@ type Commit2Response struct {
 
 func main() {
 	r := ginRouter()
-	r.Run(":8008")
+	r.Run("192.168.0.167:8081")
 }
 
 func ginRouter() *gin.Engine {
 	r := gin.Default()
-	r.POST("/seal", sealCommit2)
-	r.POST("/result", getResult)
+	r.POST("/allocate_task", sealCommit2)
+	r.POST("/query_result", getResult)
 
 	return r
 }
